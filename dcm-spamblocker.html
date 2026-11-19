@@ -1,0 +1,862 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Prefissi DCM per SpamBlocker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --paper: #E8ECE9;
+  --surface: #F7F8F6;
+  --ink: #17201D;
+  --muted: #56625D;
+  --rule: #C6CEC9;
+  --signal: #B3261E;
+  --signal-ink: #FFFFFF;
+  --ok: #1E6A58;
+  --field: #FFFFFF;
+  --hover: #DDE3DF;
+  color-scheme: light;
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #111615;
+    --surface: #182020;
+    --ink: #E3E9E6;
+    --muted: #97A39E;
+    --rule: #2D3835;
+    --signal: #FF6F61;
+    --signal-ink: #1A0B09;
+    --ok: #5EC4A9;
+    --field: #0D1211;
+    --hover: #222C2A;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #111615;
+  --surface: #182020;
+  --ink: #E3E9E6;
+  --muted: #97A39E;
+  --rule: #2D3835;
+  --signal: #FF6F61;
+  --signal-ink: #1A0B09;
+  --ok: #5EC4A9;
+  --field: #0D1211;
+  --hover: #222C2A;
+  color-scheme: dark;
+}
+*, *::before, *::after { box-sizing: inherit; }
+html { scroll-padding-top: env(safe-area-inset-top, 0px); -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "Archivo", "Helvetica Neue", Arial, system-ui, sans-serif;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+.wrap { max-width: 1180px; margin: 0 auto; padding: 32px 20px 64px; }
+
+/* ---------- Header + anatomy ---------- */
+header { padding-bottom: 28px; border-bottom: 2px solid var(--ink); }
+h1 {
+  font-stretch: 72%;
+  font-variation-settings: "wdth" 72;
+  font-weight: 760;
+  font-size: clamp(2rem, 5.2vw, 3.5rem);
+  line-height: 1.02;
+  letter-spacing: -0.01em;
+  margin: 0 0 10px;
+  max-width: 18ch;
+}
+.lede { margin: 0 0 28px; color: var(--muted); max-width: 62ch; }
+.anatomy { margin: 0; }
+.anatomy ol {
+  list-style: none; margin: 0; padding: 0;
+  display: flex; flex-wrap: wrap; align-items: stretch;
+}
+.anatomy li {
+  display: flex; flex-direction: column; justify-content: flex-end;
+  padding: 0 clamp(10px, 2vw, 22px) 0 0;
+  margin: 0 clamp(10px, 2vw, 22px) 10px 0;
+  border-right: 1px solid var(--rule);
+}
+.anatomy li:last-child { border-right: 0; margin-right: 0; padding-right: 0; }
+.anatomy .digits {
+  font-stretch: 68%;
+  font-variation-settings: "wdth" 68;
+  font-weight: 700;
+  font-size: clamp(2.6rem, 9vw, 5.4rem);
+  line-height: 0.95;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.anatomy .tail .digits { color: var(--signal); }
+.anatomy .opt .digits { color: var(--muted); }
+.anatomy .what { font-size: 0.82rem; color: var(--muted); margin-top: 6px; white-space: nowrap; }
+.anatomy figcaption { font-size: 0.88rem; color: var(--muted); margin-top: 6px; }
+.anatomy figcaption code { font-family: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace; color: var(--ink); font-size: 0.85rem; }
+
+/* ---------- Layout ---------- */
+.grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0 48px; }
+.grid > div { min-width: 0; }
+@media (min-width: 960px) { .grid { grid-template-columns: minmax(320px, 400px) minmax(0, 1fr); } }
+section.step { padding: 28px 0; border-bottom: 1px solid var(--rule); }
+.grid > div > section.step:last-child { border-bottom: 0; }
+@media (max-width: 959px) { .grid > div:first-child > section.step:last-child { border-bottom: 1px solid var(--rule); } }
+h2 {
+  display: flex; align-items: baseline; gap: 12px;
+  font-stretch: 80%; font-variation-settings: "wdth" 80;
+  font-weight: 700; font-size: 1.35rem; line-height: 1.2; margin: 0 0 14px;
+}
+h2 .n {
+  font-stretch: 65%; font-variation-settings: "wdth" 65;
+  font-size: 1.9rem; line-height: 1; color: var(--signal); min-width: 0.7em;
+}
+h3 { font-size: 1rem; font-weight: 650; margin: 22px 0 8px; }
+p { margin: 0 0 10px; }
+.hint { font-size: 0.88rem; color: var(--muted); }
+code, .mono { font-family: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace; font-size: 0.9em; }
+
+/* ---------- Drop zone ---------- */
+.drop {
+  display: block; position: relative; cursor: pointer;
+  border: 1.5px dashed var(--muted); border-radius: 6px;
+  background: var(--surface); padding: 22px 18px;
+  transition: border-color .15s, background .15s;
+}
+.drop:hover, .drop.over { border-color: var(--ink); background: var(--hover); }
+.drop:focus-within { outline: 2px solid var(--signal); outline-offset: 2px; }
+.drop input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; }
+.drop strong { display: block; font-weight: 650; }
+.drop span { font-size: 0.88rem; color: var(--muted); }
+.status { margin-top: 12px; font-size: 0.92rem; min-height: 1.5em; }
+.status.err { color: var(--signal); }
+.status.ok { color: var(--ok); }
+
+/* ---------- Search + operator list ---------- */
+.field-label { display: block; font-weight: 600; font-size: 0.92rem; margin-bottom: 6px; }
+input[type="search"], input[type="text"], input[type="tel"], select, textarea {
+  font: inherit; color: var(--ink); background: var(--field);
+  border: 1px solid var(--rule); border-radius: 4px; padding: 9px 11px; width: 100%;
+}
+input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-visible {
+  outline: 2px solid var(--signal); outline-offset: 1px;
+}
+input:disabled { opacity: .55; }
+.list-head {
+  display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--muted);
+  padding: 12px 10px 6px;
+}
+ul.ops { list-style: none; margin: 0; padding: 0; max-height: 340px; overflow-y: auto; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+ul.ops li + li { border-top: 1px solid var(--rule); }
+label.op {
+  display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: center;
+  padding: 8px 10px; cursor: pointer;
+}
+label.op:hover { background: var(--hover); }
+label.op input { accent-color: var(--signal); width: 17px; height: 17px; margin: 0; }
+.op-name { overflow-wrap: anywhere; }
+.op-count { font-variant-numeric: tabular-nums; color: var(--muted); font-size: 0.9rem; }
+.empty { padding: 14px 10px; color: var(--muted); font-size: 0.92rem; }
+.row-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; padding: 0; list-style: none; }
+.chips li {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: var(--ink); color: var(--paper); border-radius: 999px;
+  padding: 3px 4px 3px 12px; font-size: 0.86rem;
+}
+.chips button {
+  border: 0; background: transparent; color: inherit; cursor: pointer;
+  width: 24px; height: 24px; border-radius: 999px; font-size: 1rem; line-height: 1;
+}
+.chips button:hover { background: color-mix(in srgb, var(--paper) 20%, transparent); }
+
+/* ---------- Number lookup ---------- */
+.lookup { margin-top: 26px; padding-top: 18px; border-top: 1px solid var(--rule); }
+.lookup h3 { margin-top: 0; }
+.lk-out { margin-top: 12px; }
+.lk-hit { border-left: 3px solid var(--signal); padding: 2px 0 2px 14px; margin-bottom: 12px; }
+.lk-op {
+  font-stretch: 80%; font-variation-settings: "wdth" 80;
+  font-weight: 700; font-size: 1.25rem; line-height: 1.2; margin: 0 0 8px; overflow-wrap: anywhere;
+}
+dl.lk-facts { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 3px 14px; margin: 0 0 12px; font-size: 0.92rem; }
+dl.lk-facts dt { color: var(--muted); }
+dl.lk-facts dd { margin: 0; overflow-wrap: anywhere; }
+.lk-msg { color: var(--muted); font-size: 0.92rem; margin: 0; }
+
+/* ---------- Buttons ---------- */
+button.btn {
+  font: inherit; font-weight: 600; cursor: pointer;
+  border-radius: 4px; padding: 9px 16px; border: 1.5px solid var(--ink);
+  background: transparent; color: var(--ink);
+}
+button.btn:hover { background: var(--hover); }
+button.btn.primary { background: var(--signal); border-color: var(--signal); color: var(--signal-ink); }
+button.btn.primary:hover { filter: brightness(1.08); background: var(--signal); }
+button.btn.small { padding: 5px 11px; font-size: 0.88rem; border-width: 1px; }
+button.btn:disabled { opacity: .5; cursor: not-allowed; }
+
+/* ---------- Result ---------- */
+.options { display: grid; gap: 18px; margin-bottom: 22px; }
+fieldset { border: 0; padding: 0; margin: 0; }
+legend { font-weight: 600; font-size: 0.92rem; margin-bottom: 6px; padding: 0; }
+.choice { display: grid; grid-template-columns: auto 1fr; gap: 2px 10px; align-items: start; padding: 6px 0; cursor: pointer; }
+.choice input { accent-color: var(--signal); margin: 4px 0 0; width: 16px; height: 16px; }
+.choice .sub { grid-column: 2; font-size: 0.86rem; color: var(--muted); }
+.two { display: grid; gap: 18px; grid-template-columns: 1fr; }
+@media (min-width: 640px) { .two { grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr); } }
+#notify-custom { margin-top: 8px; }
+textarea.json {
+  font-family: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace; font-size: 0.82rem;
+  line-height: 1.5; min-height: 220px; resize: vertical; white-space: pre; overflow: auto;
+  background: var(--surface);
+}
+.actions { display: flex; flex-wrap: wrap; gap: 10px; margin: 12px 0 6px; }
+.facts { font-size: 0.9rem; color: var(--muted); margin-top: 6px; }
+ol.howto { margin: 0; padding-left: 1.3em; }
+ol.howto li { margin-bottom: 4px; }
+.table-wrap { overflow-x: auto; border-top: 1px solid var(--rule); }
+table { border-collapse: collapse; width: 100%; font-size: 0.9rem; }
+th, td { text-align: left; padding: 7px 12px 7px 0; border-bottom: 1px solid var(--rule); white-space: nowrap; }
+th { font-weight: 600; color: var(--muted); font-size: 0.82rem; }
+td.pref { font-family: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace; font-size: 0.86rem; }
+.placeholder { color: var(--muted); padding: 8px 0; }
+[hidden] { display: none !important; }
+
+/* ---------- Toast ---------- */
+.toast-dock {
+  position: fixed; left: 0; right: 0; bottom: 0; display: flex; justify-content: center;
+  padding: 0 16px calc(18px + env(safe-area-inset-bottom, 0px)); pointer-events: none; z-index: 20;
+}
+.toast {
+  background: var(--ink); color: var(--paper); padding: 10px 16px; border-radius: 6px; font-size: 0.92rem;
+  opacity: 0; transform: translateY(8px); transition: opacity .18s, transform .18s;
+}
+.toast.show { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) { .toast, .drop { transition: none; } }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Prefissi DCM in una regola SpamBlocker</h1>
+    <p class="lede">Carica il file dei numeri assegnati, scegli l’operatore (o scoprilo da un numero di telefono) e copia la regola da importare nell’app. Il file viene letto solo nel tuo browser e non lascia il dispositivo.</p>
+    <figure class="anatomy" aria-label="Come viene costruito ogni prefisso">
+      <ol>
+        <li id="seg-cc"><span class="digits" id="a-cc">39</span><span class="what" id="w-cc">prefisso Italia</span></li>
+        <li><span class="digits" id="a-c">0</span><span class="what">colonna C</span></li>
+        <li><span class="digits" id="a-d">144</span><span class="what">colonna D</span></li>
+        <li><span class="digits" id="a-e">01</span><span class="what">colonna E</span></li>
+        <li class="tail"><span class="digits">\d+</span><span class="what">resto del numero</span></li>
+      </ol>
+      <figcaption id="a-cap">Esempio: la riga con C = 0, D = 144, E = 01 diventa <code>39014401\d+</code></figcaption>
+    </figure>
+  </header>
+
+  <div class="grid">
+    <div>
+      <section class="step" aria-labelledby="h-file">
+        <h2 id="h-file"><span class="n">1</span>Carica il file Excel</h2>
+        <label class="drop" id="drop">
+          <input type="file" id="file" accept=".xlsx,.xlsm,.xls">
+          <strong id="drop-title">Scegli il file o trascinalo qui</strong>
+          <span>Viene letto il foglio «DCM», colonne C, D, E (prefisso) e F (operatore).</span>
+        </label>
+        <p class="status" id="status" role="status" aria-live="polite"></p>
+      </section>
+
+      <section class="step" aria-labelledby="h-op">
+        <h2 id="h-op"><span class="n">2</span>Scegli l’operatore</h2>
+        <label class="field-label" for="q">Cerca nella colonna F</label>
+        <input type="search" id="q" placeholder="Per esempio: enegan, retelit, iliad" autocomplete="off" disabled>
+        <div class="list-head" aria-hidden="true"><span>Operatore</span><span>Prefissi</span></div>
+        <ul class="ops" id="ops"><li class="empty">Carica prima il file Excel.</li></ul>
+        <div class="row-actions">
+          <button class="btn small" id="select-all" type="button" hidden>Seleziona tutti i risultati</button>
+          <button class="btn small" id="clear-sel" type="button" hidden>Svuota selezione</button>
+        </div>
+        <ul class="chips" id="chips" aria-label="Operatori selezionati"></ul>
+
+        <div class="lookup">
+          <h3>Di chi è un numero?</h3>
+          <label class="field-label" for="lk">Numero di telefono</label>
+          <input type="tel" id="lk" placeholder="Per esempio: +39 0144 011234" autocomplete="off" disabled>
+          <div class="lk-out" id="lk-out" aria-live="polite"></div>
+        </div>
+      </section>
+    </div>
+
+    <div>
+      <section class="step" aria-labelledby="h-out">
+        <h2 id="h-out"><span class="n">3</span>Copia la regola</h2>
+        <p class="placeholder" id="out-empty">Scegli almeno un operatore per generare la regola.</p>
+
+        <div id="out" hidden>
+          <div class="options">
+            <fieldset>
+              <legend>Formato del numero che chiama</legend>
+              <label class="choice">
+                <input type="radio" name="fmt" value="intl" checked>
+                <span>Solo internazionale, regex <code>39…\d+</code></span>
+                <span class="sub">SpamBlocker toglie «+» e gli zeri iniziali prima del confronto, quindi +39 0144 011234 viene confrontato come 390144011234.</span>
+              </label>
+              <label class="choice">
+                <input type="radio" name="fmt" value="nat">
+                <span>Internazionale o nazionale, regex <code>(?:\+39|0039)?…\d+</code></span>
+                <span class="sub">Riconosce anche i numeri che arrivano come 0144 011234. Attiva l’opzione «Numero grezzo» della regola.</span>
+              </label>
+            </fieldset>
+
+            <div class="two">
+              <div>
+                <label class="field-label" for="apply">Applica a</label>
+                <select id="apply">
+                  <option value="3">Chiamate e SMS</option>
+                  <option value="1">Solo chiamate</option>
+                </select>
+              </div>
+              <div>
+                <label class="field-label" for="notify">Notifica quando blocca</label>
+                <select id="notify">
+                  <option value="None">Nessuno: nessuna notifica</option>
+                  <option value="Low" selected>Bassa: solo barra di stato, senza suono (predefinita)</option>
+                  <option value="Medium">Media: con suono, senza banner</option>
+                  <option value="High">Alta: banner e suono</option>
+                  <option value="High Muted">Alta silenziata: banner senza suono</option>
+                  <option value="__custom">Un canale creato da me…</option>
+                </select>
+                <input type="text" id="notify-custom" placeholder="ID del canale come l’hai creato in SpamBlocker" aria-label="ID del canale personalizzato" hidden>
+              </div>
+            </div>
+
+            <div>
+              <label class="field-label" for="desc">Descrizione della regola</label>
+              <input type="text" id="desc" maxlength="120">
+            </div>
+
+            <label class="choice">
+              <input type="checkbox" id="compact">
+              <span>Regex compatta</span>
+              <span class="sub" id="compact-sub">Blocca gli stessi numeri con un testo più corto, utile per operatori con molti prefissi.</span>
+            </label>
+          </div>
+
+          <label class="field-label" for="json">JSON della regola</label>
+          <textarea class="json" id="json" readonly spellcheck="false"></textarea>
+          <div class="actions">
+            <button class="btn primary" id="copy" type="button">Copia JSON</button>
+            <button class="btn" id="download" type="button" disabled>Scarica .json</button>
+          </div>
+          <p class="facts" id="facts"></p>
+
+          <h3>Come importarla in SpamBlocker</h3>
+          <ol class="howto">
+            <li>Apri <strong>Impostazioni</strong>, sezione <strong>Impostazioni regex</strong>, poi <strong>Regole del numero</strong>.</li>
+            <li>Tocca <strong>Nuovo</strong> e scegli <strong>Importa</strong>.</li>
+            <li>Incolla il JSON nel campo «JSON di configurazione» e conferma con <strong>Importa</strong>.</li>
+          </ol>
+          <p class="hint">L’app importa le regole incollando il testo: il file .json serve per conservarlo o passarlo al telefono.</p>
+
+          <h3 id="rows-title">Righe trovate</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Distretto</th><th>Area locale</th><th>Prefisso</th><th id="th-op">Operatore</th></tr></thead>
+              <tbody id="rows"></tbody>
+            </table>
+          </div>
+          <p class="hint" id="rows-note"></p>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+<div class="toast-dock" aria-live="polite"><div class="toast" id="toast"></div></div>
+
+<script>
+function loadFallbackXlsx() {
+  var s = document.createElement("script");
+  s.src = "https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js";
+  document.head.appendChild(s);
+}
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" onerror="loadFallbackXlsx()"></script>
+<script>
+// Core logic: shared by the web page (inlined) and the Node tests.
+(function (root) {
+  const RAW_NUMBER_FLAG = 1024; // SpamBlocker Def.FLAG_REGEX_RAW_NUMBER
+
+  function normalize(s) {
+    return String(s ?? "")
+      .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase().replace(/\s+/g, " ").trim();
+  }
+
+  function findSheetName(names) {
+    return names.find(n => n === "DCM") ||
+      names.find(n => n.trim().toUpperCase() === "DCM") || null;
+  }
+
+  // aoa: array of rows (formatted text), columns A..F = 0..5
+  function parseRows(aoa) {
+    const rows = [];
+    let skipped = 0;
+    for (let i = 0; i < aoa.length; i++) {
+      const r = aoa[i] || [];
+      const c = String(r[2] ?? "").trim();
+      const d = String(r[3] ?? "").trim();
+      const e = String(r[4] ?? "").trim();
+      const op = String(r[5] ?? "").replace(/\s+/g, " ").trim();
+      if (!c && !d && !e && !op) continue; // empty line
+      const prefix = c + d + e;
+      if (!/^\d+$/.test(prefix) || !op) { skipped++; continue; } // header or bad row
+      rows.push({ line: i + 1, district: String(r[0] ?? "").trim(), area: String(r[1] ?? "").trim(), c, d, e, prefix, operator: op });
+    }
+    return { rows, skipped };
+  }
+
+  function groupByOperator(rows) {
+    const map = new Map();
+    for (const row of rows) {
+      if (!map.has(row.operator)) map.set(row.operator, { name: row.operator, key: normalize(row.operator), rows: [] });
+      map.get(row.operator).rows.push(row);
+    }
+    return [...map.values()].sort((a, b) => a.name.localeCompare(b.name, "it"));
+  }
+
+  // Unique prefixes, dropping any prefix already covered by a shorter one
+  // (with "\d+" after it, 014401 already matches everything 0144012 would).
+  function buildPrefixes(rows) {
+    const uniq = [...new Set(rows.map(r => r.prefix))].sort();
+    const kept = [];
+    for (const p of uniq) {
+      const last = kept[kept.length - 1];
+      if (last && p.startsWith(last)) continue; // sorted order puts the covering prefix right before
+      kept.push(p);
+    }
+    return { prefixes: kept, duplicates: rows.length - uniq.length, covered: uniq.length - kept.length };
+  }
+
+  function plainGroup(prefixes) {
+    return prefixes.length === 1 ? prefixes[0] : "(?:" + prefixes.join("|") + ")";
+  }
+
+  function digitClass(digits) {
+    if (digits.length === 1) return digits[0];
+    const n = digits.map(Number).sort((a, b) => a - b);
+    const parts = [];
+    let s = n[0], p = n[0];
+    for (let i = 1; i <= n.length; i++) {
+      if (i < n.length && n[i] === p + 1) { p = n[i]; continue; }
+      parts.push(p - s >= 2 ? `${s}-${p}` : p === s ? `${s}` : `${s}${p}`);
+      if (i < n.length) { s = p = n[i]; }
+    }
+    return "[" + parts.join("") + "]";
+  }
+
+  // Compact form: prefix tree with digit classes for the leaves.
+  function trieGroup(prefixes) {
+    const rootNode = {};
+    for (const p of prefixes) {
+      let node = rootNode;
+      for (const ch of p) node = node[ch] || (node[ch] = {});
+    }
+    const gen = (node) => {
+      const keys = Object.keys(node).sort();
+      const leaves = keys.filter(k => Object.keys(node[k]).length === 0);
+      const inner = keys.filter(k => Object.keys(node[k]).length > 0);
+      const alts = inner.map(k => k + gen(node[k]));
+      if (leaves.length) alts.push(digitClass(leaves));
+      return alts.length === 1 ? alts[0] : "(?:" + alts.join("|") + ")";
+    };
+    return gen(rootNode);
+  }
+
+  function buildPattern(prefixes, { national = false, compact = false } = {}) {
+    const group = compact ? trieGroup(prefixes) : plainGroup(prefixes);
+    return (national ? "(?:\\+39|0039)?" : "39") + group + "\\d+";
+  }
+
+  // channel: SpamBlocker notification channel id. Built-in: "None", "Low" (app default
+  // for blocked numbers), "Medium", "High", "High Muted"; or the id of a custom channel.
+  function buildRule(prefixes, { national = false, compact = false, callsOnly = false, description = "", channel = "Low" } = {}) {
+    return {
+      pattern: buildPattern(prefixes, { national, compact }),
+      patternFlags: national ? RAW_NUMBER_FLAG : 0,
+      description,
+      isBlacklist: true,
+      flags: callsOnly ? 1 : 3,
+      channel,
+    };
+  }
+
+  // Reads what a person types: +39 0144..., 0039 0144..., 390144..., 0144...
+  // Returns the national number (e.g. "0144011234") or an error code.
+  function parseItalianNumber(input) {
+    const raw = String(input ?? "").trim();
+    if (!raw) return { empty: true };
+    let s = raw.replace(/[\s\-().\/]/g, "");
+    if (!/^\+?\d+$/.test(s)) return { error: "chars" };
+    if (s.startsWith("+")) {
+      if (!s.startsWith("+39")) return { error: "foreign" };
+      s = s.slice(3);
+    } else if (s.startsWith("0039")) {
+      s = s.slice(4);
+    } else if (s.startsWith("00")) {
+      return { error: "foreign" };
+    } else if (/^390\d{8,}$/.test(s)) {
+      s = s.slice(2); // "39" typed without "+", followed by a landline number
+    }
+    return { national: s };
+  }
+
+  function buildIndex(rows) {
+    const map = new Map();
+    let minLen = Infinity, maxLen = 0;
+    for (const r of rows) {
+      if (!map.has(r.prefix)) map.set(r.prefix, []);
+      map.get(r.prefix).push(r);
+      minLen = Math.min(minLen, r.prefix.length);
+      maxLen = Math.max(maxLen, r.prefix.length);
+    }
+    return { map, minLen, maxLen };
+  }
+
+  // Longest prefix of the national number that appears in the DCM sheet.
+  function lookupNumber(index, national) {
+    for (let len = Math.min(index.maxLen, national.length); len >= index.minLen; len--) {
+      const hit = index.map.get(national.slice(0, len));
+      if (hit) return { prefix: national.slice(0, len), rows: hit };
+    }
+    return null;
+  }
+
+  root.DcmCore = { normalize, findSheetName, parseRows, groupByOperator, buildPrefixes, plainGroup, trieGroup, digitClass, buildPattern, buildRule, parseItalianNumber, buildIndex, lookupNumber, RAW_NUMBER_FLAG };
+  if (typeof module !== "undefined") module.exports = root.DcmCore;
+})(typeof window !== "undefined" ? window : globalThis);
+
+</script>
+<script>
+(function () {
+  const C = window.DcmCore;
+  const $ = (id) => document.getElementById(id);
+  const fmtInt = (n) => n.toLocaleString("it-IT");
+  const ROW_LIMIT = 200;
+
+  const state = {
+    ops: [], byName: new Map(), selected: new Set(), query: "",
+    desc: "", descEdited: false, downloads: undefined, index: null,
+  };
+
+  // ---------- helpers ----------
+  let toastTimer;
+  function toast(msg) {
+    const t = $("toast");
+    t.textContent = msg; t.classList.add("show");
+    clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove("show"), 2600);
+  }
+  function setStatus(msg, kind) {
+    const s = $("status"); s.textContent = msg; s.className = "status" + (kind ? " " + kind : "");
+  }
+  function el(tag, props, children) {
+    const n = document.createElement(tag);
+    if (props) Object.assign(n, props);
+    (children || []).forEach(c => n.append(c));
+    return n;
+  }
+  function slug(s) { return C.normalize(s).replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 40) || "operatore"; }
+
+  // ---------- file loading ----------
+  async function loadFile(file) {
+    if (!file) return;
+    if (!window.XLSX) { setStatus("La libreria per leggere i file Excel non si è caricata. Ricarica la pagina e riprova.", "err"); return; }
+    setStatus("Lettura di «" + file.name + "» in corso…");
+    $("drop-title").textContent = file.name;
+    await new Promise(r => setTimeout(r, 40));
+    try {
+      const buf = await file.arrayBuffer();
+      const names = XLSX.read(buf, { type: "array", bookSheets: true }).SheetNames;
+      const sheet = C.findSheetName(names);
+      if (!sheet) {
+        setStatus("Nel file non c’è un foglio chiamato «DCM». Fogli presenti: " + names.join(", ") + ".", "err");
+        return;
+      }
+      const wb = XLSX.read(buf, { type: "array", sheets: [sheet], cellHTML: false, cellNF: false, cellStyles: false });
+      const aoa = XLSX.utils.sheet_to_json(wb.Sheets[sheet], { header: 1, raw: false, defval: "" });
+      const { rows } = C.parseRows(aoa);
+      if (!rows.length) {
+        setStatus("Il foglio «DCM» non contiene righe con un prefisso numerico nelle colonne C, D, E.", "err");
+        return;
+      }
+      state.ops = C.groupByOperator(rows);
+      state.byName = new Map(state.ops.map(o => [o.name, o]));
+      state.index = C.buildIndex(rows);
+      state.selected.clear(); state.descEdited = false;
+      $("q").disabled = false;
+      $("lk").disabled = false;
+      setStatus("Foglio DCM letto: " + fmtInt(rows.length) + " righe, " + fmtInt(state.ops.length) + " operatori.", "ok");
+      renderOps(); renderSelection(); renderResult();
+      $("q").focus();
+    } catch (e) {
+      console.error(e);
+      setStatus("Il file non si apre come Excel. Controlla che sia un .xlsx valido e riprova.", "err");
+    }
+  }
+
+  $("file").addEventListener("change", (e) => loadFile(e.target.files[0]));
+  const drop = $("drop");
+  ["dragenter", "dragover"].forEach(t => drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.add("over"); }));
+  ["dragleave", "drop"].forEach(t => drop.addEventListener(t, () => drop.classList.remove("over")));
+  drop.addEventListener("drop", (e) => { e.preventDefault(); const f = e.dataTransfer.files[0]; if (f) loadFile(f); });
+
+  // ---------- operator list ----------
+  function filteredOps() {
+    const q = C.normalize(state.query);
+    return q ? state.ops.filter(o => o.key.includes(q)) : state.ops;
+  }
+
+  function renderOps() {
+    const ul = $("ops"); ul.textContent = "";
+    if (!state.ops.length) { ul.append(el("li", { className: "empty", textContent: "Carica prima il file Excel." })); return; }
+    const list = filteredOps();
+    if (!list.length) {
+      ul.append(el("li", { className: "empty", textContent: "Nessun operatore contiene «" + state.query.trim() + "». Prova con una parte del nome." }));
+    }
+    for (const o of list) {
+      const cb = el("input", { type: "checkbox", checked: state.selected.has(o.name) });
+      cb.addEventListener("change", () => {
+        cb.checked ? state.selected.add(o.name) : state.selected.delete(o.name);
+        renderSelection(); renderResult();
+      });
+      const count = new Set(o.rows.map(r => r.prefix)).size;
+      ul.append(el("li", null, [el("label", { className: "op" }, [
+        cb, el("span", { className: "op-name", textContent: o.name }),
+        el("span", { className: "op-count", textContent: fmtInt(count) }),
+      ])]));
+    }
+    const showAll = state.query.trim() && list.length > 1;
+    $("select-all").hidden = !showAll;
+  }
+
+  $("q").addEventListener("input", (e) => { state.query = e.target.value; renderOps(); });
+  $("select-all").addEventListener("click", () => {
+    filteredOps().forEach(o => state.selected.add(o.name));
+    renderOps(); renderSelection(); renderResult();
+  });
+  $("clear-sel").addEventListener("click", () => {
+    state.selected.clear(); state.descEdited = false;
+    renderOps(); renderSelection(); renderResult();
+  });
+
+  function renderSelection() {
+    const ul = $("chips"); ul.textContent = "";
+    for (const name of state.selected) {
+      const b = el("button", { type: "button", textContent: "×", title: "Rimuovi " + name });
+      b.setAttribute("aria-label", "Rimuovi " + name);
+      b.addEventListener("click", () => {
+        state.selected.delete(name); renderOps(); renderSelection(); renderResult();
+      });
+      ul.append(el("li", null, [el("span", { textContent: name }), b]));
+    }
+    $("clear-sel").hidden = state.selected.size === 0;
+    renderLookup();
+  }
+
+  // ---------- number lookup ----------
+  function lookupMsg(text) { $("lk-out").append(el("p", { className: "lk-msg", textContent: text })); }
+
+  function renderLookup() {
+    const out = $("lk-out"); out.textContent = "";
+    if (!state.index) return;
+    const parsed = C.parseItalianNumber($("lk").value);
+    if (parsed.empty) return;
+    if (parsed.error === "chars") return lookupMsg("Usa solo cifre, spazi e il «+» iniziale.");
+    if (parsed.error === "foreign") return lookupMsg("Non è un numero italiano: il foglio DCM contiene solo numeri con prefisso +39.");
+    const n = parsed.national;
+    if (!n.startsWith("0")) return lookupMsg(n.startsWith("3")
+      ? "Sembra un cellulare: il foglio DCM contiene solo numeri fissi, che iniziano con 0."
+      : "Il foglio DCM contiene solo numeri fissi, che iniziano con 0.");
+    if (n.length < state.index.minLen) return lookupMsg("Continua a scrivere: servono almeno " + state.index.minLen + " cifre.");
+    const hit = C.lookupNumber(state.index, n);
+    if (!hit) return lookupMsg("Nessuna riga del foglio DCM corrisponde a " + n + ". Controlla le prime cifre.");
+
+    for (const r of hit.rows) {
+      const already = state.selected.has(r.operator);
+      const btn = el("button", {
+        type: "button", className: "btn small", disabled: already,
+        textContent: already ? "Già nella selezione" : "Aggiungi alla selezione",
+      });
+      btn.addEventListener("click", () => {
+        state.selected.add(r.operator);
+        renderOps(); renderSelection(); renderResult();
+        toast(r.operator + " aggiunto alla selezione");
+      });
+      const dl = el("dl", { className: "lk-facts" });
+      [
+        ["Prefisso", r.prefix + " (C = " + r.c + ", D = " + r.d + ", E = " + r.e + ")"],
+        ["Distretto", r.district],
+        ["Area locale", r.area],
+        ["Letto come", n],
+      ].forEach(([k, v]) => dl.append(el("dt", { textContent: k }), el("dd", { textContent: v })));
+      out.append(el("div", { className: "lk-hit" }, [el("p", { className: "lk-op", textContent: r.operator }), dl, btn]));
+    }
+    out.append(el("p", { className: "hint", textContent: "È l’operatore a cui è assegnato il blocco di numeri. Se il numero è passato a un altro operatore con la portabilità, il file non lo indica." }));
+  }
+  $("lk").addEventListener("input", renderLookup);
+
+  // ---------- result ----------
+  function defaultDesc(names) {
+    return names.length === 1 ? "Blocco " + names[0] : "Blocco " + names.length + " operatori";
+  }
+  function options() {
+    return {
+      national: document.querySelector('input[name="fmt"]:checked').value === "nat",
+      compact: $("compact").checked,
+      callsOnly: $("apply").value === "1",
+      channel: notifyChannel(),
+    };
+  }
+  function notifyChannel() {
+    const v = $("notify").value;
+    if (v !== "__custom") return v;
+    return $("notify-custom").value.trim() || "Low";
+  }
+
+  function renderAnatomy(row, national) {
+    $("a-cc").textContent = national ? "+39?" : "39";
+    $("w-cc").textContent = national ? "+39 o 0039, facoltativo" : "prefisso Italia";
+    $("seg-cc").classList.toggle("opt", national);
+    const r = row || { c: "0", d: "144", e: "01", prefix: "014401" };
+    $("a-c").textContent = r.c; $("a-d").textContent = r.d; $("a-e").textContent = r.e;
+    const cap = $("a-cap"); cap.textContent = "";
+    const pattern = (national ? "(?:\\+39|0039)?" : "39") + r.prefix + "\\d+";
+    cap.append((row ? "Prima riga di " + row.operator + ": C = " : "Esempio: la riga con C = ") + r.c + ", D = " + r.d + ", E = " + r.e + " diventa ",
+      el("code", { textContent: pattern }));
+  }
+
+  let current = null;
+  function renderResult() {
+    const names = [...state.selected];
+    const opt = options();
+    const hasSel = names.length > 0;
+    $("out").hidden = !hasSel; $("out-empty").hidden = hasSel;
+    if (!hasSel) { renderAnatomy(null, opt.national); current = null; return; }
+
+    const rows = names.flatMap(n => state.byName.get(n).rows);
+    const { prefixes, duplicates, covered } = C.buildPrefixes(rows);
+    if (!state.descEdited) { state.desc = defaultDesc(names); $("desc").value = state.desc; }
+    const rule = C.buildRule(prefixes, { ...opt, description: state.desc });
+    const json = JSON.stringify(rule, null, 2);
+    current = { names, json };
+    $("json").value = json;
+    renderAnatomy(rows[0], opt.national);
+
+    const plainLen = C.buildPattern(prefixes, { national: opt.national }).length;
+    const compactLen = C.buildPattern(prefixes, { national: opt.national, compact: true }).length;
+    $("compact-sub").textContent = "Blocca gli stessi numeri con un testo più corto: " + fmtInt(compactLen) +
+      " caratteri invece di " + fmtInt(plainLen) + ".";
+
+    let facts = fmtInt(rows.length) + (rows.length === 1 ? " riga trovata, " : " righe trovate, ") +
+      fmtInt(prefixes.length) + (prefixes.length === 1 ? " prefisso" : " prefissi") + " nella regex";
+    const dropped = duplicates + covered;
+    if (dropped) facts += " (" + fmtInt(dropped) + " già coperti da altri prefissi)";
+    facts += ". La regex è lunga " + fmtInt(rule.pattern.length) + " caratteri.";
+    if (!opt.compact && plainLen > 20000) facts += " Con la regex compatta diventa molto più corta.";
+    $("facts").textContent = facts;
+
+    const tb = $("rows"); tb.textContent = "";
+    const multi = names.length > 1;
+    $("th-op").hidden = !multi;
+    rows.slice(0, ROW_LIMIT).forEach(r => {
+      const tr = el("tr", null, [
+        el("td", { textContent: r.district }), el("td", { textContent: r.area }),
+        el("td", { className: "pref", textContent: r.prefix }),
+      ]);
+      if (multi) tr.append(el("td", { textContent: r.operator }));
+      tb.append(tr);
+    });
+    $("rows-title").textContent = "Righe trovate (" + fmtInt(rows.length) + ")";
+    $("rows-note").textContent = rows.length > ROW_LIMIT ? "Sono mostrate le prime " + ROW_LIMIT + " righe: la regola le comprende tutte." : "";
+  }
+
+  document.querySelectorAll('input[name="fmt"]').forEach(r => r.addEventListener("change", renderResult));
+  $("compact").addEventListener("change", renderResult);
+  $("apply").addEventListener("change", renderResult);
+  $("notify").addEventListener("change", () => {
+    const custom = $("notify").value === "__custom";
+    $("notify-custom").hidden = !custom;
+    if (custom) $("notify-custom").focus();
+    renderResult();
+  });
+  $("notify-custom").addEventListener("input", renderResult);
+  $("desc").addEventListener("input", (e) => { state.desc = e.target.value; state.descEdited = true; renderResult(); });
+  $("json").addEventListener("focus", (e) => e.target.select());
+
+  // ---------- copy ----------
+  async function copyText(text) {
+    try { await navigator.clipboard.writeText(text); return true; } catch (_) {}
+    const ta = el("textarea", { value: text, readOnly: true });
+    ta.style.position = "fixed"; ta.style.opacity = "0"; ta.style.top = "0";
+    document.body.append(ta); ta.select();
+    let ok = false;
+    try { ok = document.execCommand("copy"); } catch (_) {}
+    ta.remove();
+    return ok;
+  }
+  $("copy").addEventListener("click", async () => {
+    if (!current) return;
+    if (await copyText(current.json)) toast("JSON copiato");
+    else { $("json").focus(); $("json").select(); toast("Copia non riuscita: il testo è selezionato, copialo a mano"); }
+  });
+
+  // ---------- download ----------
+  function fileName() {
+    if (!current) return "spamblocker.json";
+    return current.names.length === 1 ? "spamblocker-" + slug(current.names[0]) + ".json"
+      : "spamblocker-" + current.names.length + "-operatori.json";
+  }
+  async function initDownloads() {
+    if (window.claude && typeof window.claude.use === "function") {
+      try { state.downloads = await window.claude.use("downloads"); } catch (_) { state.downloads = null; }
+    } else {
+      state.downloads = "browser"; // page opened outside claude.ai
+    }
+    $("download").hidden = state.downloads === null;
+    $("download").disabled = false;
+  }
+  $("download").addEventListener("click", async () => {
+    if (!current) return;
+    const name = fileName();
+    if (state.downloads === "browser") {
+      const url = URL.createObjectURL(new Blob([current.json], { type: "application/json" }));
+      const a = el("a", { href: url, download: name }); document.body.append(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 2000);
+      return;
+    }
+    if (!state.downloads) return;
+    try {
+      await state.downloads.save({ filename: name, data: current.json });
+      toast("File salvato");
+    } catch (e) {
+      const code = e && e.code;
+      if (code === "declined") return;
+      if (code === "rate_limited") toast("Attendi un attimo e riprova");
+      else { toast("Il download non è disponibile qui: usa Copia JSON"); $("download").hidden = true; }
+    }
+  });
+
+  renderAnatomy(null, false);
+  initDownloads();
+})();
+</script>
+</body>
+</html>
