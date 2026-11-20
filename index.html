@@ -328,8 +328,8 @@ td.pref { font-family: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace
               <div>
                 <label class="field-label" for="notify">Notifica quando blocca</label>
                 <select id="notify">
-                  <option value="None">Nessuno: nessuna notifica</option>
-                  <option value="Low" selected>Bassa: solo barra di stato, senza suono (predefinita)</option>
+                  <option value="None" selected>Nessuno: nessuna notifica</option>
+                  <option value="Low">Bassa: solo barra di stato, senza suono</option>
                   <option value="Medium">Media: con suono, senza banner</option>
                   <option value="High">Alta: banner e suono</option>
                   <option value="High Muted">Alta silenziata: banner senza suono</option>
@@ -345,7 +345,7 @@ td.pref { font-family: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace
             </div>
 
             <label class="choice">
-              <input type="checkbox" id="compact">
+              <input type="checkbox" id="compact" checked>
               <span>Regex compatta</span>
               <span class="sub" id="compact-sub">Blocca gli stessi numeri con un testo più corto, utile per operatori con molti prefissi.</span>
             </label>
@@ -728,7 +728,7 @@ function loadFallbackXlsx() {
   function notifyChannel() {
     const v = $("notify").value;
     if (v !== "__custom") return v;
-    return $("notify-custom").value.trim() || "Low";
+    return $("notify-custom").value.trim() || "None";
   }
 
   function renderAnatomy(row, national) {
