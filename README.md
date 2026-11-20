@@ -25,7 +25,7 @@ Il Ministero aggiorna il file periodicamente: conviene scaricare la versione pi�
  
 ## Avvio rapido
  
-1. Apri `dcm-spamblocker.html` in un browser (serve la connessione a internet per caricare la libreria che legge i file Excel).
+1. Apri `index.html` in un browser (serve la connessione a internet per caricare la libreria che legge i file Excel).
 2. Carica il file «File Assegnati» scaricato dal sito del Ministero.
 3. Cerca l’operatore per nome (basta una parte, per esempio `enegan` o `retelit`) e selezionalo.
 4. Premi **Copia JSON**.
